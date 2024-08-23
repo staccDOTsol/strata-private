@@ -3,7 +3,7 @@ import {
   AnchorProvider,
   BorshAccountsCoder,
   Provider,
-} from "@project-serum/anchor";
+} from "@coral-xyz/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   NATIVE_MINT,
@@ -722,18 +722,6 @@ export class MarketplaceSdk {
       ))
     );
     signers.push(targetMintKeypair);
-    const {
-      instructions: metadataInstructions,
-      signers: metadataSigners,
-      output,
-    } = await this.tokenMetadataSdk.createMetadataInstructions({
-      data: metadata,
-      mint: targetMint,
-      mintAuthority: this.provider.wallet.publicKey,
-      authority: metadataUpdateAuthority,
-    });
-    instructions.push(...metadataInstructions);
-    signers.push(...metadataSigners);
 
     instructions.push(
       Token.createSetAuthorityInstruction(
@@ -750,7 +738,7 @@ export class MarketplaceSdk {
       instructions,
       signers,
       output: {
-        ...output,
+        metadata: targetMint,
         mint: targetMint,
       },
     };

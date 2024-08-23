@@ -1,4 +1,4 @@
-import { AnchorProvider, Provider } from "@project-serum/anchor";
+import { AnchorProvider, Provider } from "@coral-xyz/anchor";
 import { ChatSdk } from "@strata-foundation/chat";
 import { useProvider } from "@strata-foundation/react";
 import React, { useContext, useMemo } from "react";

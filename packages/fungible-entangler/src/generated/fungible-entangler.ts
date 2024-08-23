@@ -1,4 +1,4 @@
-import { IdlAccounts, Idl } from '@project-serum/anchor';
+import { IdlAccounts, Idl } from '@coral-xyz/anchor';
 export const FungibleEntanglerIDLJson: Idl & { metadata?: { address: string } } = {
   "version": "1.0.0",
   "name": "fungible_entangler",

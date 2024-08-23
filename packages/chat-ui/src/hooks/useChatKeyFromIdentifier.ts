@@ -1,5 +1,5 @@
 import { ENTRY_SEED, NAMESPACES_PROGRAM_ID } from "@cardinal/namespaces";
-import { utils } from "@project-serum/anchor";
+import { utils } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { ChatSdk } from "@strata-foundation/chat";
 import { useAccount } from "@strata-foundation/react";

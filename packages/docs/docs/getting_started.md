@@ -27,7 +27,7 @@ Now, we can initialize the sdks:
 
 ```jsx
 import { PublicKey } from "@solana/web3.js"
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
 import { BN } from "bn.js";
 import { SplTokenBonding } from "@strata-foundation/spl-token-bonding";
 import { SplTokenCollective } from "@strata-foundation/spl-token-collective";

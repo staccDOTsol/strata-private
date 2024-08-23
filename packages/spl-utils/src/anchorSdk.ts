@@ -5,9 +5,9 @@ import {
   Program,
   AnchorProvider,
   RpcNamespace,
-} from "@project-serum/anchor";
-import { AllInstructions } from "@project-serum/anchor/dist/cjs/program/namespace/types";
-import { Wallet } from "@project-serum/anchor/dist/cjs/provider";
+} from "@coral-xyz/anchor";
+import { AllInstructions } from "@coral-xyz/anchor/dist/cjs/program/namespace/types";
+import { Wallet } from "@coral-xyz/anchor/dist/cjs/provider";
 import { PublicKey, Signer, TransactionInstruction, Commitment, Finality } from "@solana/web3.js";
 import { TypedAccountParser } from "./accountFetchCache";
 import { BigInstructionResult, InstructionResult, sendInstructions, sendMultipleInstructions } from "./transaction";

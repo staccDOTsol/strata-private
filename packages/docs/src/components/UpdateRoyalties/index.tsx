@@ -81,8 +81,7 @@ export function UpdateRoyalties() {
     [id]
   );
   const { info: collective } = useCollective(collectiveKey && collectiveKey[0]);
-  const tokenBondingSettings = collective?.config
-    .claimedTokenBondingSettings as ITokenBondingSettings | undefined;
+  const tokenBondingSettings = collective?.config.claimedTokenBondingSettings as unknown as ITokenBondingSettings | undefined;
   
   const {
     metadata: targetMetadata,

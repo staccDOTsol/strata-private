@@ -38,7 +38,7 @@
     "@giphy/react-components": "^5.8.0",
     "@hookform/resolvers": "^2.8.8",
     "@metaplex-foundation/mpl-token-metadata": "^1.2.5",
-    "@project-serum/anchor": "^0.24.2",
+    "@coral-xyz/anchor": "^0.29.0",
     "@solana/spl-token": "0.1.8",
     "@solana/wallet-adapter-base": "^0.9.18",
     "@solana/wallet-adapter-exodus": "^0.1.13",

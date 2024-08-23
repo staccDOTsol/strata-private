@@ -1,5 +1,5 @@
 import { getOrca, OrcaPoolConfig } from "@orca-so/sdk";
-import { AnchorProvider, Wallet } from "@project-serum/anchor";
+import { AnchorProvider, Wallet } from "@coral-xyz/anchor";
 import { ShdwDrive } from "@shadow-drive/sdk";
 import { StorageAccountInfo } from "@shadow-drive/sdk/dist/types";
 import {
@@ -19,26 +19,8 @@ import {
 } from "@strata-foundation/spl-utils";
 import BN from "bn.js";
 import Decimal from "decimal.js";
+import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 
-export default class NodeWallet implements Wallet {
-  constructor(readonly payer: Keypair) {}
-
-  async signTransaction(tx: Transaction): Promise<Transaction> {
-    tx.partialSign(this.payer);
-    return tx;
-  }
-
-  async signAllTransactions(txs: Transaction[]): Promise<Transaction[]> {
-    return txs.map((t) => {
-      t.partialSign(this.payer);
-      return t;
-    });
-  }
-
-  get publicKey(): PublicKey {
-    return this.payer.publicKey;
-  }
-}
 
 const PROGRAM_ID = new PublicKey(
   "2e1wdyNhUvE76y6yUCvah2KaviavMJYKoRun8acMRBZZ"
@@ -75,6 +57,7 @@ async function getOwnedAmount(
   const acct = await provider.connection.getAccountInfo(ata, "confirmed");
   if (acct) {
     return toNumber(
+      // @ts-ignore
       u64.fromBuffer(AccountLayout.decode(acct.data).amount),
       mintAcc
     );
@@ -228,10 +211,6 @@ export async function initStorageIfNeeded(
     } else if (!storageAccount) {
       await withRetries(
         () => shdwDrive.createStorageAccount("chat", sizeKB + "KB", "v2"),
-        3
-      );
-      await withRetries(
-        () => shdwDrive.makeStorageImmutable(accountKey, "v2"),
         3
       );
     }

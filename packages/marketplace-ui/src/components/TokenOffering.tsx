@@ -14,7 +14,7 @@ import {
 } from "@strata-foundation/react";
 import { useAsyncCallback } from "react-async-hook";
 import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { ASSOCIATED_PROGRAM_ID } from "@project-serum/anchor/dist/cjs/utils/token";
+import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 const identity = () => {};

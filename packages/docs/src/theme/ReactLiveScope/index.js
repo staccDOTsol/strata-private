@@ -10,7 +10,7 @@ import {
   Numberu64,
 } from "@solana/spl-name-service";
 import { Toaster } from "react-hot-toast";
-import { Program } from "@project-serum/anchor";
+import { Program } from "@coral-xyz/anchor";
 import { DarkMode, CSSReset } from "@chakra-ui/react";
 import { ChatSdk, MessageType, PermissionType } from "@strata-foundation/chat";
 import {

@@ -1,4 +1,4 @@
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
 import { Keypair } from "@solana/web3.js";
 import { expect, use } from "chai";
 import ChaiAsPromised from "chai-as-promised";
@@ -17,7 +17,7 @@ import { DataV2 } from "@metaplex-foundation/mpl-token-metadata";
 import { NATIVE_MINT } from "@solana/spl-token";
 import { waitForUnixTime } from "./utils/clock";
 import { SplTokenCollective } from "@strata-foundation/spl-token-collective";
-import { AnchorProvider } from "@project-serum/anchor";
+import { AnchorProvider } from "@coral-xyz/anchor";
 import { FungibleEntangler } from "@strata-foundation/fungible-entangler";
 
 use(ChaiAsPromised);

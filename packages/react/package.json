@@ -29,7 +29,7 @@
     "@apollo/client": "^3.6.9",
     "@hookform/resolvers": "^2.8.3",
     "@metaplex-foundation/mpl-token-metadata": "^1.2.5",
-    "@project-serum/anchor": "^0.24.2",
+    "@coral-xyz/anchor": "^0.29.0",
     "@project-serum/serum": "^0.13.61",
     "@solana/spl-governance": "^0.0.27",
     "@solana/spl-name-service": "^0.1.3",

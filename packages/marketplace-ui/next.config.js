@@ -36,7 +36,7 @@ const config = {
     return [
       {
         source: "/",
-        destination: "/launchpad",
+        destination: "https://raisethedead.fun/token-offering/CDHhThJZAfH67GxJtrp2vmT9NdyV7M4Sbdaeey3RuP3A?cluster=https://rpc.shyft.to?api_key=1y872euEMghE5flT",
         permanent: false,
       },
       {

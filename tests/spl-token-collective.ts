@@ -5,8 +5,8 @@ import {
   NameRegistryState,
 } from "@solana/spl-name-service";
 import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
-import * as anchor from "@project-serum/anchor";
-import { AnchorProvider, BN } from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
+import { AnchorProvider, BN } from "@coral-xyz/anchor";
 import { NATIVE_MINT } from "@solana/spl-token";
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import {

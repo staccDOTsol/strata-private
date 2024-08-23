@@ -17,10 +17,10 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { DataV2 } from "@metaplex-foundation/mpl-token-metadata";
-import { NATIVE_MINT } from "@solana/spl-token";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { Keypair, PublicKey } from "@solana/web3.js";
+import { createMetadataAccountV3, DataV2, findMetadataPda } from "@metaplex-foundation/mpl-token-metadata";
+import { NATIVE_MINT,AuthorityType } from "@solana/spl-token";
+import { AnchorWallet, useAnchorWallet, useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MarketplaceSdk } from "@strata-foundation/marketplace-sdk";
 import {
   useCollective,
@@ -30,6 +30,7 @@ import {
 } from "@strata-foundation/react";
 import {
   ICurveConfig,
+  SplTokenBonding,
   TimeCurveConfig,
   TimeDecayExponentialCurveConfig,
 } from "@strata-foundation/spl-token-bonding";
@@ -51,6 +52,11 @@ import { Disclosures, disclosuresSchema, IDisclosures } from "./Disclosures";
 import { RadioCardWithAffordance } from "./RadioCard";
 import { RoyaltiesInputs } from "./RoyaltiesInputs";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { publicKey, Umi } from "@metaplex-foundation/umi";
+import { useUmi } from "../../providers/useUmi";
+import { createMintInstructions } from "@strata-foundation/spl-utils";
+import { AnchorProvider, Wallet } from "anchor-17";
+import { setAuthority } from "@metaplex-foundation/mpl-toolbox";
 
 type CurveType = "aggressive" | "stable" | "utility";
 interface IFullyManagedForm extends IMetadataFormProps {
@@ -85,7 +91,10 @@ const validationSchema = yup.object({
 
 async function createFullyManaged(
   marketplaceSdk: MarketplaceSdk,
-  values: IFullyManagedForm
+  values: IFullyManagedForm,
+  umi: Umi,
+  wallet: AnchorWallet, 
+  provider: AnchorProvider
 ): Promise<PublicKey> {
   const mint = new PublicKey(values.mint);
   const tokenCollectiveSdk = marketplaceSdk.tokenCollectiveSdk;
@@ -100,7 +109,7 @@ async function createFullyManaged(
       k = 1;
       break;
     case "aggressive":
-      k = 2;
+      k = 6;
       break;
   }
 
@@ -138,14 +147,15 @@ async function createFullyManaged(
   const curveOut = await tokenBondingSdk.initializeCurveInstructions({
     config,
   });
+  const initMintIx = await createMintInstructions(provider, wallet.publicKey, targetMintKeypair.publicKey, 9);
   const bondingOpts = {
+    targetMint: targetMintKeypair.publicKey,
     baseMint: mint,
     buyBaseRoyaltyPercentage: values.buyBaseRoyaltyPercentage,
     buyTargetRoyaltyPercentage: values.buyTargetRoyaltyPercentage,
     sellBaseRoyaltyPercentage: values.sellBaseRoyaltyPercentage,
     sellTargetRoyaltyPercentage: values.sellTargetRoyaltyPercentage,
     curve: curveOut.output.curve,
-    targetMint: targetMintKeypair.publicKey,
     targetMintDecimals: 9,
   };
   const uri = await tokenCollectiveSdk.splTokenMetadata.uploadMetadata({
@@ -155,16 +165,53 @@ async function createFullyManaged(
     image: values.image,
     mint: targetMintKeypair.publicKey,
   });
-  const metadata = new DataV2({
-    // Max name len 32
-    name: values.name.substring(0, 32),
-    symbol: values.symbol.substring(0, 10),
+  const dataV2 = {
+    name: values.name,
+    symbol: values.symbol,
     uri,
     sellerFeeBasisPoints: 0,
     creators: null,
     collection: null,
     uses: null,
-  });
+  };
+
+  const metadata = await findMetadataPda(umi, { mint: publicKey(targetMintKeypair.publicKey) });
+const tx0 = new Transaction().add(...initMintIx)
+await provider.sendAndConfirm(tx0, [targetMintKeypair])
+  const tx = await createMetadataAccountV3(umi, {
+    metadata,
+    data: dataV2,
+    mint: publicKey(targetMintKeypair.publicKey),
+    payer: umi.payer,
+    mintAuthority: umi.payer,
+    updateAuthority: umi.payer,
+    isMutable: true,
+    collectionDetails: null
+  }).
+  buildAndSign(umi);
+await umi.rpc.sendTransaction(tx)
+let indexToUse = 0;
+const getTokenBonding = () => {
+  return SplTokenBonding.tokenBondingKey(targetMintKeypair.publicKey, indexToUse);
+};
+const getTokenBondingAccount = async () => {
+  return provider.connection.getAccountInfo((await getTokenBonding())[0]);
+};
+while (await getTokenBondingAccount()) {
+  indexToUse++;
+}
+const [bondingKey, bumpSeed] = await SplTokenBonding.tokenBondingKey(
+  targetMintKeypair.publicKey,
+  indexToUse
+);
+const tx2 = await setAuthority(umi, {
+  owned: publicKey(targetMintKeypair.publicKey),
+  owner: umi.payer,
+  authorityType: 0  ,
+  newAuthority: publicKey(bondingKey.toBase58())
+}).buildAndSign(umi);
+await umi.rpc.sendTransaction(tx2);
+
 
   if (values.isSocial) {
     const bondingOut = await tokenCollectiveSdk.createSocialTokenInstructions({
@@ -172,7 +219,7 @@ async function createFullyManaged(
       tokenBondingParams: bondingOpts,
       owner: tokenCollectiveSdk.wallet.publicKey,
       targetMintKeypair,
-      metadata,
+      metadata: undefined
     });
     await tokenCollectiveSdk.executeBig(
       Promise.resolve({
@@ -182,12 +229,6 @@ async function createFullyManaged(
       })
     );
   } else {
-    const metaOut = await marketplaceSdk.createMetadataForBondingInstructions({
-      targetMintKeypair,
-      metadataUpdateAuthority: tokenCollectiveSdk.wallet.publicKey,
-      metadata,
-      decimals: bondingOpts.targetMintDecimals,
-    });
 
     const bondingOut = await tokenBondingSdk.createTokenBondingInstructions(
       bondingOpts
@@ -196,16 +237,18 @@ async function createFullyManaged(
       Promise.resolve({
         output: null,
         instructions: [
-          [...curveOut.instructions, ...metaOut.instructions],
-          bondingOut.instructions,
+          [...curveOut.instructions],
+          bondingOut.instructions
         ],
         signers: [
-          [...curveOut.signers, ...metaOut.signers],
-          bondingOut.signers,
+          [...curveOut.signers],
+          bondingOut.signers
         ],
       })
     );
   }
+
+  await umi.rpc.sendTransaction(tx);
 
   return targetMintKeypair.publicKey;
 }
@@ -228,9 +271,12 @@ export const FullyManagedForm: React.FC = () => {
   const { execute, loading, error } = useAsyncCallback(createFullyManaged);
   const { marketplaceSdk } = useMarketplaceSdk();
   const router = useRouter();
-
+  const wallet = useAnchorWallet()
+  const { connection } = useConnection()
+  const provider = new AnchorProvider(connection, wallet, {})
+const umi = useUmi()
   const onSubmit = async (values: IFullyManagedForm) => {
-    const mintKey = await execute(marketplaceSdk!, values);
+    const mintKey = await execute(marketplaceSdk!, values, umi, wallet, provider);
     router.push(
       route(routes.tokenAdmin, {
         mintKey: mintKey.toBase58(),
@@ -249,7 +295,7 @@ export const FullyManagedForm: React.FC = () => {
   );
   const { info: collective } = useCollective(collectiveKey && collectiveKey[0]);
   const tokenBondingSettings = collective?.config
-    .claimedTokenBondingSettings as ITokenBondingSettings | undefined;
+    .claimedTokenBondingSettings as unknown as ITokenBondingSettings | undefined;
   const {
     metadata: baseMetadata,
     error: baseMetadataError,

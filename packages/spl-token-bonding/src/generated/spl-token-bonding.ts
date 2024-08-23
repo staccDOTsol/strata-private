@@ -1,4 +1,4 @@
-import { IdlAccounts, Idl } from '@project-serum/anchor';
+import { IdlAccounts, Idl } from '@coral-xyz/anchor';
 export const SplTokenBondingIDLJson: Idl & { metadata?: { address: string } } = {
   "version": "3.9.2",
   "name": "spl_token_bonding",

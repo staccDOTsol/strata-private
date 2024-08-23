@@ -3,12 +3,12 @@ import {
   IdentifierType,
   PermissionType,
 } from "@strata-foundation/chat";
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 // @ts-ignore
 import LitJsSdk from "lit-js-sdk";
 import { ChatIDL } from "@strata-foundation/chat";
-import { AnchorProvider, Program } from "@project-serum/anchor";
+import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import {
   NAMESPACES_IDL,
   NAMESPACES_PROGRAM,

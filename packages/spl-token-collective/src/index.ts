@@ -5,13 +5,13 @@ import {
   DataV2,
   MetadataProgram,
 } from "@metaplex-foundation/mpl-token-metadata";
-import * as anchor from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
 import {
   AnchorProvider,
   IdlTypes,
   Program,
   Provider,
-} from "@project-serum/anchor";
+} from "@coral-xyz/anchor";
 import { getHashedName, NameRegistryState } from "@solana/spl-name-service";
 import {
   AccountInfo as TokenAccountInfo,
@@ -1251,39 +1251,10 @@ export class SplTokenCollective extends AnchorSdk<SplTokenCollectiveIDL> {
       throw new Error("Social token already exists for this wallet or name");
     }
 
-    // create metadata with payer as temporary authority
-    console.log("Creating social token metadata...");
-    // @ts-ignore
-    let uri = metadataUri || config?.unclaimedTokenMetadataSettings?.uri;
-
-    if (!uri) {
-      throw new Error(
-        "Must pass metadata.uri or it must be defined on the collective config"
-      );
-    }
 
     const tokenBonding = (
       await SplTokenBonding.tokenBondingKey(targetMint, 0)
     )[0];
-
-    const {
-      instructions: metadataInstructions,
-      signers: metadataSigners,
-      output: { metadata: tokenMetadata },
-    } = await this.splTokenMetadata.createMetadataInstructions({
-      mint: targetMint!,
-      authority: owner ? owner : mintTokenRef,
-      data: new DataV2({
-        uri,
-        collection: null,
-        uses: null,
-        creators: null,
-        sellerFeeBasisPoints: 0,
-        ...metadata,
-      }),
-    });
-    instructions1.push(...metadataInstructions);
-    signers1.push(...metadataSigners);
 
     instructions1.push(
       Token.createSetAuthorityInstruction(
@@ -1378,7 +1349,6 @@ export class SplTokenCollective extends AnchorSdk<SplTokenCollectiveIDL> {
         (collectiveAcct?.authority as PublicKey | undefined) ||
         PublicKey.default,
       collective,
-      tokenMetadata: new PublicKey(tokenMetadata),
       tokenBonding,
       payer,
       baseMint,
@@ -1436,7 +1406,6 @@ export class SplTokenCollective extends AnchorSdk<SplTokenCollectiveIDL> {
             payer,
             ownerTokenRef,
             mintTokenRef,
-            tokenMetadata,
             systemProgram: SystemProgram.programId,
             rent: SYSVAR_RENT_PUBKEY,
           },

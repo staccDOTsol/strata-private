@@ -10,7 +10,7 @@ import {
   ICandyMachine,
   useCandyMachine,
 } from "@strata-foundation/marketplace-ui";
-import { AnchorProvider } from "@project-serum/anchor";
+import { AnchorProvider } from "@coral-xyz/anchor";
 import { Button } from "@chakra-ui/react";
 
 import { sendInstructions } from "@strata-foundation/spl-utils";

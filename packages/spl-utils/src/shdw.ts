@@ -1,7 +1,7 @@
 import { getOrca, OrcaPoolConfig } from "@orca-so/sdk";
-import { AnchorProvider, Wallet } from "@project-serum/anchor";
+import { AnchorProvider, Wallet } from "@coral-xyz/anchor";
 import { ShdwDrive } from "@shadow-drive/sdk";
-import { StorageAccountInfo } from "@shadow-drive/sdk/dist/types";
+import { StorageAccountInfo } from "@shadow-drive/sdk";
 import {
   AccountLayout,
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -19,26 +19,7 @@ import {
 } from ".";
 import BN from "bn.js";
 import Decimal from "decimal.js";
-
-export default class NodeWallet implements Wallet {
-  constructor(readonly payer: Keypair) {}
-
-  async signTransaction(tx: Transaction): Promise<Transaction> {
-    tx.partialSign(this.payer);
-    return tx;
-  }
-
-  async signAllTransactions(txs: Transaction[]): Promise<Transaction[]> {
-    return txs.map((t) => {
-      t.partialSign(this.payer);
-      return t;
-    });
-  }
-
-  get publicKey(): PublicKey {
-    return this.payer.publicKey;
-  }
-}
+import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 
 const PROGRAM_ID = new PublicKey(
   "2e1wdyNhUvE76y6yUCvah2KaviavMJYKoRun8acMRBZZ"
@@ -75,6 +56,7 @@ async function getOwnedAmount(
   const acct = await provider.connection.getAccountInfo(ata, "confirmed");
   if (acct) {
     return toNumber(
+      // @ts-ignore
       u64.fromBuffer(AccountLayout.decode(acct.data).amount),
       mintAcc
     );
@@ -121,9 +103,10 @@ export async function initStorageIfNeeded(
     );
 
     const [accountKey] = await getStorageAccount(pubKey, new BN(0));
-    let storageAccount: StorageAccountInfo | undefined;
+    let storageAccount: any | undefined;
     try {
-      storageAccount = await shdwDrive.getStorageAccount(accountKey);
+      // @ts-ignore
+      storageAccount = (await shdwDrive.getStorageAccount(accountKey)).account;
     } catch (e: any) {
       // ignore
     }
@@ -178,6 +161,7 @@ export async function initStorageIfNeeded(
           .getExpectedOutputAmount()
           .toNumber()} SOL`
       );
+      // @ts-ignore
       if (quote.getExpectedOutputAmount().toU64().gte(new BN(solOwnedAmount))) {
         throw new Error("Not enough sol");
       }
@@ -224,16 +208,14 @@ export async function initStorageIfNeeded(
 
     if (storageAccount && sizeKB && !storageAccountBigEnough) {
       await withRetries(
-        () => shdwDrive.addStorage(accountKey, sizeKB + "KB", "v2"),
+        // @ts-ignore
+        () => shdwDrive.addStorage(accountKey, sizeKB + "KB",333333),
         3
       );
     } else if (!storageAccount) {
       await withRetries(
-        () => shdwDrive.createStorageAccount("chat", sizeKB + "KB", "v2"),
-        3
-      );
-      await withRetries(
-        () => shdwDrive.makeStorageImmutable(accountKey, "v2"),
+        // @ts-ignore
+        () => shdwDrive.createStorageAccount("chat", sizeKB + "KB", 333333),
         3
       );
     }

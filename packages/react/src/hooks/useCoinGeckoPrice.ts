@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useInterval } from "./useInterval";
 import LRU from "lru-cache";
 
-const lru = new LRU({
+const lru = new LRU<string, number>({
   ttl: 1000 * 60 * 2,
   ttlAutopurge: true
 });
@@ -27,7 +27,7 @@ export async function getCoinGeckoPriceUsd(
     }
   }
 
-  return lru.get(searchName);
+  return lru.get(searchName) as number | undefined;
 }
 
 export const useCoinGeckoPrice = (tokenName: string = "solana"): number | undefined => {

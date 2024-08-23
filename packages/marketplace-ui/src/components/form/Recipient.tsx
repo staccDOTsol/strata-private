@@ -159,7 +159,6 @@ export const Recipient = ({
             resize="none"
             boxShadow="none"
             ring="none"
-            placeholder="Enter Address"
             _focus={{ boxShadow: "none" }}
           />
         </VStack>

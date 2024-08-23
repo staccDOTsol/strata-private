@@ -13,7 +13,7 @@ import {
   VerifyCollection,
   CreateMasterEditionV3
 } from "@metaplex-foundation/mpl-token-metadata";
-import { AnchorProvider, BN } from "@project-serum/anchor";
+import { AnchorProvider, BN } from "@coral-xyz/anchor";
 import { AccountInfo as TokenAccountInfo, MintInfo } from "@solana/spl-token";
 import { PublicKey, Signer, TransactionInstruction } from "@solana/web3.js";
 import { getMintInfo, InstructionResult, sendInstructions, truthy } from ".";
@@ -340,6 +340,7 @@ export class SplTokenMetadata {
   }
 
   async uploadMetadata(args: IUploadMetadataArgs): Promise<string> {
+    // @ts-ignore
     const [accountKey] = await getStorageAccount(this.provider.wallet.publicKey, new BN(0));
 
     let randomId = Math.floor(Math.random()*(999-100+1)+100);

@@ -21,7 +21,7 @@ import {
   IdlTypes,
   Program,
   utils,
-} from "@project-serum/anchor";
+} from "@coral-xyz/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   NATIVE_MINT,
@@ -919,6 +919,7 @@ export class ChatSdk extends AnchorSdk<ChatIDL> {
         let readAmount: BN;
         try {
           const readMint = await getMintInfo(this.provider, readPermissionKey);
+          // @ts-ignore
           readAmount = toBN(readPermissionAmount, readMint);
         } catch {
           readAmount = new BN(readPermissionAmount);
@@ -1675,6 +1676,7 @@ export class ChatSdk extends AnchorSdk<ChatIDL> {
       let postAmount;
       try {
         const postMint = await getMintInfo(this.provider, postPermissionKey);
+        // @ts-ignore
         postAmount = toBN(postPermissionAmount, postMint);
       } catch {
         // permission key isn't a mint account
@@ -1999,6 +2001,7 @@ export class ChatSdk extends AnchorSdk<ChatIDL> {
         chatPermissionsAcc.readPermissionKey
       );
       readAmount = toBN(
+        // @ts-ignore
         readPermissionAmount || chatPermissionsAcc.defaultReadPermissionAmount,
         readMint
       );

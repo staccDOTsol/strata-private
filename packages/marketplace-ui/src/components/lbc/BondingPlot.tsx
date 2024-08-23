@@ -98,7 +98,7 @@ export const BondingPlot = ({
       // calculate the initial reserve and supply of the lbc
       for (let c of changes) {
         let price = Math.abs((Number(c.reserveChange) / Math.pow(10, baseMint.decimals)) / (Number(c.supplyChange) / Math.pow(10, targetMint.decimals)));
-        if (price === NaN || price === Infinity) continue;
+        if (Number.isNaN(price) || price === Infinity) continue;
 
         currReserve += (Number(c.reserveChange) / Math.pow(10, baseMint.decimals))*royaltyFactor;
         currSupply += (Number(c.supplyChange) / Math.pow(10, targetMint.decimals))*royaltyFactor;
@@ -128,7 +128,7 @@ export const BondingPlot = ({
         });
       }
       
-      return result.filter(p => p.price !== NaN && p.price !== Infinity);
+      return result.filter(p => !Number.isNaN(p.price) && p.price !== Infinity);
     }
     return [];
   }, [enrichedBondingChanges, baseMint, targetMint, curve, stopTime, tokenBonding]);

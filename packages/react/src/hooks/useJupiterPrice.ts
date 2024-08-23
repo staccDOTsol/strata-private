@@ -42,7 +42,7 @@ export async function getJupiterPriceCached(
     }
   }
 
-  return lru.get(key);
+  return lru.get(key) as number | undefined;
 }
 
 export const useJupiterPrice = (

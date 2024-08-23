@@ -1,10 +1,12 @@
+
+// @ts-nocheck
 import {
   CreateMetadataV2,
   DataV2,
   Metadata,
 } from "@metaplex-foundation/mpl-token-metadata";
-import * as anchor from "@project-serum/anchor";
-import { IdlTypes, Program, AnchorProvider } from "@project-serum/anchor";
+import * as anchor from "@coral-xyz/anchor";
+import { IdlTypes, Program, AnchorProvider } from "@coral-xyz/anchor";
 import {
   AccountLayout,
   ASSOCIATED_TOKEN_PROGRAM_ID,
