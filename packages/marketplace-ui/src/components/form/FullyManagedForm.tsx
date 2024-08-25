@@ -121,6 +121,7 @@ async function createFullyManaged(
     d: 1,
     interval: 2 * 60 * 60, // 2 hours
   });
+  
   if (values.isAntiBot) {
     config = new TimeCurveConfig()
       .addCurve(
@@ -130,7 +131,7 @@ async function createFullyManaged(
           k0: 0,
           k1: 0,
           d: 1,
-          interval: 0,
+          interval: 30 * 60, // 30 minutes
         })
       )
       .addCurve(
@@ -138,9 +139,19 @@ async function createFullyManaged(
         new TimeDecayExponentialCurveConfig({
           c,
           k0: 0,
+          k1: k / 2,
+          d: 0.75,
+          interval: 30 * 60, // 30 minutes
+        })
+      )
+      .addCurve(
+        60 * 60, // 1 hour
+        new TimeDecayExponentialCurveConfig({
+          c,
+          k0: k / 2,
           k1: k,
           d: 0.5,
-          interval: 1.5 * 60 * 60, // 1.5 hours
+          interval: 60 * 60, // 1 hour
         })
       );
   }

@@ -4,14 +4,10 @@ import { MetadataMeta } from "../../../../src/components/MetadataMeta";
 import { SITE_URL } from "../../../../src/constants";
 import { mintMetadataServerSideProps } from "../../../../src/utils/tokenMetadataServerProps";
 import {
-  Box, Container,
-  DarkMode, useColorModeValue,
-  VStack
+  Box, Container, DarkMode, VStack
 } from "@chakra-ui/react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import {
-  usePublicKey
-} from "@strata-foundation/react";
+import { usePublicKey } from "@strata-foundation/react";
 import {
   GetServerSideProps,
   InferGetServerSidePropsType,
@@ -20,35 +16,28 @@ import {
 import { useRouter } from "next/router";
 import React, { useCallback } from "react";
 
-export const getServerSideProps: GetServerSideProps =
-  mintMetadataServerSideProps;
+export const getServerSideProps: GetServerSideProps = mintMetadataServerSideProps;
 
-export const LbcDisplay: NextPage = ({
+export const LbcDisplay: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = ({
   name,
-  image,
   description,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  image,
+}) => {
   const router = useRouter();
+  const { id } = router.query;
+  const mintKey = usePublicKey(id as string);
+  const { setVisible } = useWalletModal();
 
-  const { id: idRaw } = router.query;
-  const id = usePublicKey(idRaw as string);
+  const onConnectWallet = useCallback(() => setVisible(true), [setVisible]);
 
-  const { visible, setVisible } = useWalletModal();
-
-  const onConnectWallet = useCallback(
-    () => setVisible(!visible),
-    [visible, setVisible]
-  );
 
   return (
     <>
-      <Disclaimer />
       <Box
-        color={useColorModeValue("black", "white")}
         w="full"
-        backgroundColor="black.500"
+        backgroundColor="black"
+        height="100vh"
         overflow="auto"
-        minH="100vh"
         paddingBottom="200px"
       >
         <MetadataMeta
@@ -58,8 +47,8 @@ export const LbcDisplay: NextPage = ({
           url={`${SITE_URL}/lbcs/token-offering/${id?.toString()}/`}
         />
         <VStack spacing={2} align="left">
-          <Container mt={"35px"} justifyContent="stretch" maxW="600px">
-            <Lbc id={id} onConnectWallet={onConnectWallet} />
+          <Container mt="35px" justifyContent="stretch" maxW="600px">
+            <Lbc id={mintKey} onConnectWallet={onConnectWallet} />
           </Container>
         </VStack>
       </Box>
@@ -67,12 +56,10 @@ export const LbcDisplay: NextPage = ({
   );
 };
 
-export const DarkModeDisplay: NextPage = (props) => {
-  return (
-    <DarkMode>
-      <LbcDisplay {...props} />
-    </DarkMode>
-  );
-};
+export const DarkModeDisplay: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (props) => (
+  <DarkMode>
+    <LbcDisplay {...props} />
+  </DarkMode>
+);
 
 export default DarkModeDisplay;

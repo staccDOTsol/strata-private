@@ -94,6 +94,7 @@ export const LbcInfo = ({
   }, [unixTime]);
 
   const endDate = new Date(0);
+  console.log(tokenBonding)
   endDate.setUTCSeconds(
     (tokenBonding?.goLiveUnixTime.toNumber() || 0) + (maxTime || 0)
   );

@@ -16,6 +16,7 @@ import { useAsyncCallback } from "react-async-hook";
 import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { BondingPlot } from "./lbc";
 
 const identity = () => {};
 export const TokenOffering = ({
@@ -129,6 +130,8 @@ export const TokenOffering = ({
   });
 
   return (
+    <>      <BondingPlot tokenBondingKey={id} /> {/* Add this line to include BondingPlot */}
+
     <SwapForm
       showAttribution={showAttribution}
       isLoading={driverLoading}
@@ -136,6 +139,6 @@ export const TokenOffering = ({
       {...swapProps}
       onSubmit={onSubmit}
       numRemaining={numRemaining}
-    />
+    /></>
   );
 };

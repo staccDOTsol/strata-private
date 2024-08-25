@@ -129,7 +129,7 @@ async function createLbcCandyMachine(
   const authority = new PublicKey(values.authority);
   const mint = new PublicKey(values.mint);
 
-  const metadata = new DataV2({
+  const metadata = ({
     // Max name len 32
     name: "Candymachine Mint Token",
     symbol: "",
@@ -252,7 +252,7 @@ async function createLbcExistingMint(
     await getMintInfo(marketplaceSdk.provider, existingMint)
   ).decimals;
 
-  const metadata = new DataV2({
+  const metadata = ({
     name: values.name || "",
     symbol: values.symbol || "",
     uri: values.uri || "",
@@ -321,7 +321,7 @@ async function createLbcNewMint(
     image: values.image,
     mint: targetMintKeypair.publicKey,
   });
-  const metadata = new DataV2({
+  const metadata = ({
     // Max name len 32
     name: values.name!.substring(0, 32),
     symbol: (values.symbol || "").substring(0, 10),
